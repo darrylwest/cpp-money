@@ -14,6 +14,7 @@
 #include <string>
 
 namespace money {
+    constexpr auto VERSION = "0.5.0-101";
 
     struct Money {
       private:

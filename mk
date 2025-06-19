@@ -30,7 +30,7 @@ do
 
             shift
         ;;
-        unit)
+        test|unit)
             (cd build && make -j4 && ctest --output-on-failure)
             ./build/money_tests
 
