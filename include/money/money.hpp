@@ -91,31 +91,8 @@ namespace money {
         friend bool operator>=(const Money& lhs, const Money& rhs) { return lhs.m_cents >= rhs.m_cents; }
 
         // convert this to US dollars
-        auto to_string() const {
-            // Use int64_t here for consistency
-            const int64_t total_cents = as_cents();
-            const int64_t abs_cents = std::abs(total_cents);
-            const auto sign = (total_cents < 0) ? "-" : "";
-
-            // now the thousands delimiter
-            std::string ss = std::format(std::locale("en_US.UTF-8"), "{:L}", abs_cents / 100);
-
-            return std::format("{}${}.{:02}", sign, ss, abs_cents % 100);
-        }
+        std::string to_string() const ;
     };
 
-}  // namespace app
+}  // namespace money
 
-// The std::formatter also needs to know about int64_t
-template <> struct std::formatter<app::Money> {
-    constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
-
-    auto format(const app::Money& money, format_context& ctx) const {
-        // Use int64_t here for consistency
-        const int64_t total_cents = money.as_cents();
-        const int64_t abs_cents = std::abs(total_cents);
-        const auto sign = (total_cents < 0) ? "-" : "";
-
-        return std::format_to(ctx.out(), "{}${}.{:02}", sign, abs_cents / 100, abs_cents % 100);
-    }
-};
