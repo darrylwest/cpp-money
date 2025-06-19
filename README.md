@@ -1,6 +1,6 @@
 # Cpp Money
 
-A small money library for handling currency.
+A small c++23 library for handling currency, mostly US Dollars.
 
 ```
  ______                     _______                          
