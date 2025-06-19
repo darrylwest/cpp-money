@@ -14,16 +14,12 @@ do
     case $1 in
         init)
             /bin/rm -fr build/
-            # [ -d dep-cache ] || mkdir dep-cache
             (mkdir build && cd build && cmake ..)
 
             shift
         ;;
         build)
             clear
-
-            # remove any old unit test
-            /bin/rm -f build/money_tests
 
             # cmake --build build/ 
             (cd build && time make -j4 || exit 1)
@@ -42,11 +38,6 @@ do
 
             shift
         ;;
-        single)
-            python scripts/merge_to_header_only.py
-
-            shift
-        ;;
         clean)
             (cd build && make clean && /bin/rm -f unit)
         
@@ -62,13 +53,11 @@ do
 
             exit 0
         ;;
-
         pull)
             git pull
 
             shift
         ;;
-
         help)
             echo "Targets:"
             echo ""
