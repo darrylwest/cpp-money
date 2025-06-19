@@ -92,8 +92,7 @@ namespace money {
         friend bool operator>=(const Money& lhs, const Money& rhs) { return lhs.m_cents >= rhs.m_cents; }
 
         // convert this to US dollars
-        std::string to_string() const ;
+        std::string to_string() const;
     };
 
 }  // namespace money
-

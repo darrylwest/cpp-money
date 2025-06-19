@@ -4,11 +4,11 @@
 #include <cstdint>
 #include <format>
 #include <iomanip>
+#include <money/money.hpp>
 #include <ranges>
 #include <sstream>
 #include <stdexcept>
 #include <string>
-#include <money/money.hpp>
 
 namespace money {
 
@@ -30,7 +30,5 @@ namespace money {
 template <> struct std::formatter<money::Money> {
     constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
 
-    auto format(const money::Money& money, format_context &) const {
-        return money.to_string();
-    }
+    auto format(const money::Money& money, format_context&) const { return money.to_string(); }
 };
