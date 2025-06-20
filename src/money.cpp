@@ -28,7 +28,7 @@ namespace money {
 
 // The std::formatter also needs to know about int64_t
 template <> struct std::formatter<money::Money> {
-    // constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
+    constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
 
     auto format(const money::Money& money, format_context&) const { return money.to_string(); }
 };
