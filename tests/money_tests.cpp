@@ -144,3 +144,21 @@ TEST_CASE("Money tests", "[from_string][edge]") {
         REQUIRE(false);
     }
 }
+
+TEST_CASE("Money tests", "[from_dollars]") {
+    double dollars = 12345.01;
+    auto v1 = Money::from_dollars(dollars);
+    REQUIRE(v1.as_cents() == 1234501);
+
+    dollars = 5432.0;
+    v1 = Money::from_dollars(dollars);
+    REQUIRE(v1.as_cents() == 543200);
+
+    dollars = -123.33;
+    v1 = Money::from_dollars(dollars);
+    REQUIRE(v1.as_cents() == -12333);
+
+    dollars = -123.00;
+    v1 = Money::from_dollars(dollars);
+    REQUIRE(v1.as_cents() == -12300);
+}
