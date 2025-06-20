@@ -13,6 +13,8 @@
 #include <stdexcept>
 #include <string>
 
+#include "../../../../../../../opt/homebrew/Cellar/fmt/11.2.0/include/fmt/base.h"
+
 namespace money {
     constexpr auto VERSION = "0.5.0-101";
 
@@ -26,6 +28,18 @@ namespace money {
         constexpr Money() : m_cents(0) {}
         // Use int64_t in the constructor
         constexpr explicit Money(int64_t cents) : m_cents(cents) {}
+
+        constexpr explicit Money(const int64_t dollars, const u_int8_t cents) {
+            if (cents > 99) {
+                throw std::invalid_argument("cents value must be between 0..99");
+            }
+
+            if (dollars < 0) {
+                m_cents = dollars * 100 - cents;
+            } else {
+                m_cents = dollars * 100 + cents;
+            }
+        }
 
         static Money zero() { return Money(0); }
 

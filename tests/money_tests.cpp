@@ -47,6 +47,14 @@ TEST_CASE("Money tests", "[constructor]") {
         auto v3 = value * 3;
         REQUIRE(v3.as_cents() == cents * 3);
     }
+
+    auto v1 = Money(12345, 99);
+    REQUIRE(v1.as_cents() == 1234599);
+
+    auto v2 = Money(-12345, 99);
+    REQUIRE(v2.as_cents() == -1234599);
+
+    REQUIRE_THROWS_AS(Money(7, 101), std::invalid_argument);
 }
 
 TEST_CASE("Money tests", "[from_string]") {
