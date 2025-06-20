@@ -29,9 +29,13 @@ namespace money {
 
         static Money zero() { return Money(0); }
 
-        static Money from_dollars(double dollars) {
-            // The cast now goes to int64_t
-            return Money(static_cast<int64_t>(dollars * 100.0));
+        static Money from_dollars(const double dollars) {
+            // this way works; don't try to manipulate the double
+
+            const auto ss = std::format("{:02}", dollars);
+            auto m = Money::from_string(ss);
+
+            return m;
         }
 
         static Money from_string(const std::string& value) {

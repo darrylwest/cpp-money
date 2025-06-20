@@ -48,7 +48,7 @@ do
             shift
         ;;
         watch)
-            watchexec -c -w src/ -w include/ -e h,hpp,cpp ./mk clobber init build unit
+            watchexec -c -w src/ -w include/ -w tests/ -e h,hpp,cpp ./mk clobber init build unit
 
             exit 0
         ;;
