@@ -83,6 +83,21 @@ TEST_CASE("Money tests", "[from_string]") {
     }
 }
 
+TEST_CASE("Money tests", "[dollars,cents]") {
+    int64_t dollars = 12345;
+    int8_t cents = 0;
+    auto v1 = Money(dollars, cents);
+    REQUIRE(v1.cents() == cents);
+    REQUIRE(v1.dollars() == dollars);
+    auto v2 = Money(1234500);
+    REQUIRE(v1.as_cents() == 1234500);
+    REQUIRE(v1 == v2);
+
+    v1 = Money(-1234567);
+    REQUIRE(v1.cents() == -67);
+    REQUIRE(v1.dollars() == -12345);
+}
+
 TEST_CASE("Money tests", "[from_string][bad]") {
     REQUIRE_THROWS_AS(Money::from_string("$100.0"), std::invalid_argument);
     REQUIRE_THROWS_AS(Money::from_string("$100."), std::invalid_argument);

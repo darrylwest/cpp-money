@@ -87,6 +87,12 @@ namespace money {
         constexpr int64_t as_cents() const { return m_cents; }
         double as_dollars() const { return static_cast<double>(m_cents) / 100.0; }
 
+        // returns the dollar component of this money object
+        constexpr int64_t dollars() const { return m_cents / 100; }
+
+        // returns the cents component of this money object
+        constexpr int8_t cents() const { return m_cents % 100; }
+
         // --- Operator Overloading (no changes needed here) ---
         friend Money operator+(const Money& lhs, const Money& rhs) { return Money(lhs.m_cents + rhs.m_cents); }
 
