@@ -175,4 +175,13 @@ TEST_CASE("Money tests", "[ops]") {
 
     const auto p3 = Money::from_dollars(100);
     REQUIRE(p3 / 2 == Money(5000));
+
+    const auto p4 = Money(100);
+    auto scale = 1.1;
+    const auto p5 = p4 * scale;
+    REQUIRE(p5.as_cents() == 110.00);
+
+    scale = 0.95;
+    const auto p6 = p4 * scale;
+    REQUIRE(p6.as_cents() == 95.00);
 }
