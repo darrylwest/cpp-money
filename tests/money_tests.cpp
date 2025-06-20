@@ -162,3 +162,17 @@ TEST_CASE("Money tests", "[from_dollars]") {
     v1 = Money::from_dollars(dollars);
     REQUIRE(v1.as_cents() == -12300);
 }
+
+TEST_CASE("Money tests", "[ops]") {
+    const auto p1 = Money::from_dollars(342.45);
+    REQUIRE(p1.as_cents() == 34245);
+
+    const auto p2 = Money(34245);
+    REQUIRE(p2 == p1);
+
+    REQUIRE(p1 + p2 == p1 * 2);
+    REQUIRE(p1 - p2 == Money::zero());
+
+    const auto p3 = Money::from_dollars(100);
+    REQUIRE(p3 / 2 == Money(5000));
+}
