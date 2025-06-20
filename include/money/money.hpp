@@ -13,8 +13,6 @@
 #include <stdexcept>
 #include <string>
 
-#include "../../../../../../../opt/homebrew/Cellar/fmt/11.2.0/include/fmt/base.h"
-
 namespace money {
     constexpr auto VERSION = "0.5.0-101";
 
