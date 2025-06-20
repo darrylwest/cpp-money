@@ -19,30 +19,57 @@ namespace helpers {
         std::uniform_int_distribution<int> distr(min, max);
         return distr(generator);
     }
+
+    double random_double(float min = -200000.0, float max = 2000000.0) {
+        std::uniform_real_distribution<double> distr(min, max);
+        return distr(generator);
+    }
+}
+
+TEST_CASE("Money tests", "[constructor]") {
+    for (int i = 0; i < 100; ++i) {
+        const auto cents = helpers::random_int(-100000000, 100000000);
+        auto value = Money(cents);
+        REQUIRE(value.as_cents() == cents);
+
+        const auto one = Money(1);
+        const auto minus_one = Money(-1);
+
+        auto v1 = Money(cents + 1);
+        REQUIRE(v1 > value);
+        REQUIRE(v1 - one == value);
+        REQUIRE(v1 + minus_one == value);
+        auto v2 = Money(cents - 1);
+        REQUIRE(v2 < value);
+        REQUIRE(v2 + one == value);
+        REQUIRE(v2 - minus_one == value);
+
+        auto v3 = value * 3;
+        REQUIRE(v3.as_cents() == cents * 3);
+    }
 }
 
 TEST_CASE("Money tests", "[from_string]") {
 
-    REQUIRE(Money::zero() == Money());
 
     // test positive numbers
     for (int i = 0; i < 100; ++i) {
-        const auto cents = helpers::random_int(10000, 10000000);
+        const auto cents = helpers::random_int(1000, 10000000);
         auto expected = Money(cents);
         auto value = Money::from_string(expected.to_string());
 
-        std::println("cents: {}, value: {}, expected: {}", cents, value.to_string(), expected.to_string());
+        // std::println("cents: {}, value: {}, expected: {}", cents, value.to_string(), expected.to_string());
 
         REQUIRE(value == expected);
     }
 
     // negative numbers
     for (int i = 0; i < 100; ++i) {
-        const auto cents = helpers::random_int(-1000000, -100);
+        const auto cents = helpers::random_int(-10000000, -1000);
         auto expected = Money(cents);
         auto value = Money::from_string(expected.to_string());
 
-        std::println("cents: {}, value: {}, expected: {}", cents, value.to_string(), expected.to_string());
+        // std::println("cents: {}, value: {}, expected: {}", cents, value.to_string(), expected.to_string());
 
         REQUIRE(value == expected);
     }
@@ -57,7 +84,8 @@ TEST_CASE("Money tests", "[from_string][bad]") {
 }
 
 TEST_CASE("Money tests", "[from_string][edge]") {
-    REQUIRE(true);
+    REQUIRE(Money::zero() == Money());
+
     auto v1 = Money::from_string("$0.00");
     REQUIRE(v1 == Money::zero());
     REQUIRE(v1.as_cents() == 0);
@@ -77,21 +105,19 @@ TEST_CASE("Money tests", "[from_string][edge]") {
 
     auto v4 = Money::from_string("$10000123.45");
     auto v5 = Money::from_dollars(10000123.45);
-    std::println("big numbers: {} -> {}", v4.as_cents(), v5.as_cents());
+    // std::println("big numbers: {} -> {}", v4.as_cents(), v5.as_cents());
 
-    std::println("big number: {} -> {}", v4.as_dollars(), v4.to_string());
+    // std::println("big number: {} -> {}", v4.as_dollars(), v4.to_string());
     REQUIRE(v4.as_cents() == 1000012345);
     REQUIRE(v4.to_string() == "$10,000,123.45");
 
     try {
         v4 = Money::from_string("-$70123.45");
         v5 = Money::from_dollars(-70123.45);
-        std::println("big numbers: {} -> {}", v4.as_cents(), v5.as_cents());
+        // std::println("big numbers: {} -> {}", v4.as_cents(), v5.as_cents());
         REQUIRE(v4 == v5);
     } catch (const std::invalid_argument& e) {
         std::println("big numbers test failed on negative numbers");
-        // REQUIRE(false);
+        REQUIRE(false);
     }
-
-
 }
