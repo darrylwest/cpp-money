@@ -18,7 +18,9 @@ The base type is int64_t representing currency to the penny.  Constructors conve
 
 ## Construct & Use
 
-```
+```c++
+#include <money/money.hpp>
+
 const auto p1 = Money::from_dollars(342.45);
 assert(p1.as_cents() == 34245);
 std::println(p1.to_string()); // $342.45
@@ -47,6 +49,33 @@ std::println("{}", p4.to_string()); // -$123.00
 ```
 
 _See unit tests for more examples..._
+
+## Notes
+
+_Compiled and tested on osx clang 17.0 and linux gcc 14.2.0_
+
+There is a shell script `mk` to build, test and deploy the lib.  Or, you can do this...
+
+```bash
+
+mkdir build && cd build && cmake .. && make && ./money_tests && sudo make install
+
+```
+
+Here is how to use in your cmake project:
+
+```
+include_directories(/usr/local/include)
+link_directories(/usr/local/lib)
+
+find_library(MONEY_LIBRARY NAMES money PATHS /usr/local/lib)
+find_path(MONEY_INCLUDE_DIR NAMES money/money.hpp PATHS /usr/local/include)
+
+if(NOT MONEY_LIBRARY OR NOT MONEY_INCLUDE_DIR)
+    message(FATAL_ERROR "money lib not found")
+endif()
+
+```
 
 ###### dpw | 2025-06-20
 
