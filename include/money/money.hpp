@@ -15,7 +15,7 @@
 #include <string>
 
 namespace money {
-    constexpr auto VERSION = "0.5.2-103";
+    constexpr auto VERSION = "0.5.3-104";
 
     struct Money {
       private:
@@ -103,7 +103,9 @@ namespace money {
         friend Money operator*(const Money& lhs, const int scalar) { return Money(lhs.m_cents * scalar); }
 
         // scale up or down by a percentage
-        friend Money operator*(const Money& lhs, const double scale) { return Money::from_dollars(lhs.as_dollars() * scale); }
+        friend Money operator*(const Money& lhs, const double scale) {
+            return Money::from_dollars(lhs.as_dollars() * scale);
+        }
 
         friend Money operator/(const Money& lhs, int scalar) {
             // Handle rounding if necessary, here we just truncate
