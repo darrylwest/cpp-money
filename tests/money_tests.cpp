@@ -46,6 +46,13 @@ TEST_CASE("Money tests", "[constructor]") {
 
         auto v3 = value * 3;
         REQUIRE(v3.as_cents() == cents * 3);
+
+        auto v4 = Money(cents / 2);
+        auto v5 = Money::zero();
+        v5 += v4;
+
+        REQUIRE(v5 == v4);
+
     }
 
     auto v1 = Money(12345, 99);
@@ -58,8 +65,6 @@ TEST_CASE("Money tests", "[constructor]") {
 }
 
 TEST_CASE("Money tests", "[from_string]") {
-
-
     // test positive numbers
     for (int i = 0; i < 100; ++i) {
         const auto cents = helpers::random_int(1000, 10000000);

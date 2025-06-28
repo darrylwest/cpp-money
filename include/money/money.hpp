@@ -15,7 +15,7 @@
 #include <string>
 
 namespace money {
-    constexpr auto VERSION = "0.5.3-104";
+    constexpr auto VERSION = "0.5.4-105";
 
     struct Money {
       private:
@@ -93,7 +93,21 @@ namespace money {
         // returns the cents component of this money object
         constexpr int8_t cents() const { return m_cents % 100; }
 
-        // --- Operator Overloading (no changes needed here) ---
+        // --- Operator Overloading --
+        constexpr Money& operator+=(const Money& rhs) noexcept {
+            // Modify the member of the left-hand-side object
+            m_cents += rhs.m_cents;
+            // Return a reference to the modified object
+            return *this;
+        }
+
+        constexpr Money& operator-=(const Money& rhs) noexcept {
+            // Modify the member of the left-hand-side object
+            m_cents -= rhs.m_cents;
+            // Return a reference to the modified object
+            return *this;
+        }
+
         friend Money operator+(const Money& lhs, const Money& rhs) { return Money(lhs.m_cents + rhs.m_cents); }
 
         friend Money operator-(const Money& lhs, const Money& rhs) { return Money(lhs.m_cents - rhs.m_cents); }
