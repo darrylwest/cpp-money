@@ -27,6 +27,9 @@ target_compile_options(${PROJECT_NAME} PRIVATE
         -Werror
 )
 
+# Link system libraries needed for C++23 locale formatting
+target_link_libraries(${PROJECT_NAME} PRIVATE pthread)
+
 # Add tests (if tests directory exists)
 if(EXISTS ${CMAKE_SOURCE_DIR}/tests)
     enable_testing()

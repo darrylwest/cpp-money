@@ -44,11 +44,17 @@ jobs:
           libmpc-dev \
           flex \
           bison \
-          texinfo
+          texinfo \
+          locales \
+          locales-all
         
         # Install CMake 3.30+ first
         pip3 install cmake --user
         echo "$HOME/.local/bin" >> $GITHUB_PATH
+        
+        # Generate en_US.UTF-8 locale for std::format locale support
+        sudo locale-gen en_US.UTF-8
+        sudo update-locale LANG=en_US.UTF-8
         
         # Create GCC build directory
         mkdir -p $HOME/gcc-build
