@@ -61,6 +61,9 @@ TEST_CASE("Money tests", "[constructor]") {
     auto v2 = Money(-12345, 99);
     REQUIRE(v2.as_cents() == -1234599);
 
+    auto v3 = Money(-1, 50);
+    REQUIRE(v3.as_cents() == -150);
+
     REQUIRE_THROWS_AS(Money(7, 101), std::invalid_argument);
 }
 
@@ -139,6 +142,12 @@ TEST_CASE("Money tests", "[from_string][edge]") {
     REQUIRE(v4.as_cents() == 1000012345);
     REQUIRE(v4.to_string() == "$10,000,123.45");
 
+    auto v6 = Money::from_string("$1,234.56");
+    REQUIRE(v6.as_cents() == 123456);
+
+    auto v7 = Money::from_string("$1,234,567.89");
+    REQUIRE(v7.as_cents() == 123456789);
+
     try {
         v4 = Money::from_string("-$70123.45");
         v5 = Money::from_dollars(-70123.45);
@@ -189,4 +198,24 @@ TEST_CASE("Money tests", "[ops]") {
     scale = 0.95;
     const auto p6 = p4 * scale;
     REQUIRE(p6.as_cents() == 95.00);
+}
+
+TEST_CASE("Money tests", "[from_dollars][zero]") {
+    auto v1 = Money::from_dollars(0.0);
+    REQUIRE(v1.as_cents() == 0);
+    REQUIRE(v1.as_dollars() == 0.0);
+
+    auto v2 = Money::from_dollars(0.00);
+    REQUIRE(v2.as_cents() == 0);
+    REQUIRE(v2.as_dollars() == 0.0);
+
+    auto v3 = Money::from_dollars(-0.0);
+    REQUIRE(v3.as_cents() == 0);
+    REQUIRE(v3.as_dollars() == 0.0);
+}
+
+TEST_CASE("Money tests", "[multiplication][negative_scalar]") {
+    const auto p7 = Money(100);
+    const auto p8 = p7 * -1;
+    REQUIRE(p8.as_cents() == -100);
 }

@@ -136,6 +136,20 @@ namespace money {
 
         // convert this to US dollars
         std::string to_string() const;
+
+        // --- State Checks ---
+        constexpr bool is_zero() const { return m_cents == 0; }
+        constexpr bool is_positive() const { return m_cents > 0; }
+        constexpr bool is_negative() const { return m_cents < 0; }
+
+        // --- Unary Operators ---
+        constexpr Money abs() const { return Money(std::abs(m_cents)); }
     };
+
+    // --- Stream Operator ---
+    inline std::ostream& operator<<(std::ostream& os, const Money& money) {
+        os << money.to_string();
+        return os;
+    }
 
 }  // namespace money
