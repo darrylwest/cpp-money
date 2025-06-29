@@ -46,7 +46,9 @@ jobs:
           bison \
           texinfo \
           locales \
-          locales-all
+          locales-all \
+          libfmt-dev \
+          pkg-config
         
         # Install CMake 3.30+ first
         pip3 install cmake --user
