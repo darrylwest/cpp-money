@@ -1,6 +1,6 @@
 # Claude Code Context
 
-This document provides context for the c++23 money library.
+This document provides context for the c++23 money library.  The target environments are osx and linux.
 
 ## Project Overview
 
