@@ -145,6 +145,9 @@ TEST_CASE("Money tests", "[from_string][edge]") {
     auto v6 = Money::from_string("$1,234.56");
     REQUIRE(v6.as_cents() == 123456);
 
+    auto v7 = Money::from_string("$1,234,567.89");
+    REQUIRE(v7.as_cents() == 123456789);
+
     try {
         v4 = Money::from_string("-$70123.45");
         v5 = Money::from_dollars(-70123.45);
