@@ -27,6 +27,8 @@ do
             shift
         ;;
         test|unit)
+            (cd build && time make -j4 || exit 1)
+
             ./build/money_tests
 
             shift

@@ -190,3 +190,13 @@ TEST_CASE("Money tests", "[ops]") {
     const auto p6 = p4 * scale;
     REQUIRE(p6.as_cents() == 95.00);
 }
+
+TEST_CASE("Money tests", "[from_dollars][zero]") {
+    auto v1 = Money::from_dollars(0.0);
+    REQUIRE(v1.as_cents() == 0);
+    REQUIRE(v1.as_dollars() == 0.0);
+
+    auto v2 = Money::from_dollars(0.00);
+    REQUIRE(v2.as_cents() == 0);
+    REQUIRE(v2.as_dollars() == 0.0);
+}
