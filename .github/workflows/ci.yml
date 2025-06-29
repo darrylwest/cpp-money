@@ -9,56 +9,37 @@ on:
 
 jobs:
   build-test-demo:
-    runs-on: ubuntu-latest
-    container: debian:12
+    runs-on: ubuntu-24.04
     
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
       
-    - name: Configure APT sources and install dependencies
+    - name: Install dependencies and upgrade GCC
       run: |
         # Update package lists
-        apt-get update
+        sudo apt-get update
         
-        # Install basic tools
-        apt-get install -y wget gnupg2 software-properties-common
-        
-        # Add testing repository for GCC 14
-        echo "deb http://deb.debian.org/debian testing main" >> /etc/apt/sources.list
-        echo "deb-src http://deb.debian.org/debian testing main" >> /etc/apt/sources.list
-        
-        # Set up APT pinning to prefer stable but allow GCC 14 from testing
-        mkdir -p /etc/apt/preferences.d
-        cat > /etc/apt/preferences.d/gcc14 << 'EOF'
-        Package: *
-        Pin: release a=testing
-        Pin-Priority: 50
-        
-        Package: gcc-14 g++-14 libstdc++-14-dev
-        Pin: release a=testing
-        Pin-Priority: 990
-        EOF
-        
-        # Update package lists with new sources
-        apt-get update
-        
-        # Install GCC 14 and development tools
-        apt-get install -y \
-          gcc-14 \
-          g++-14 \
-          libstdc++-14-dev \
+        # Install basic development tools
+        sudo apt-get install -y \
           build-essential \
-          make \
-          python3 \
+          wget \
+          software-properties-common \
           python3-pip \
           libcatch2-dev \
           clang-format \
           git
         
+        # Add toolchain repository for newer GCC
+        sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
+        sudo apt-get update
+        
+        # Install GCC 14
+        sudo apt-get install -y gcc-14 g++-14
+        
         # Set GCC 14 as default
-        update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-14 100
-        update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-14 100
+        sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-14 100
+        sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-14 100
         
         # Install CMake 3.30+
         pip3 install cmake --break-system-packages
