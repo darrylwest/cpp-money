@@ -155,11 +155,8 @@ namespace money {
 }  // namespace money
 
 // std::formatter specialization for Money
-template <>
-struct std::formatter<money::Money> {
-    constexpr auto parse(std::format_parse_context& ctx) {
-        return ctx.begin();
-    }
+template <> struct std::formatter<money::Money> {
+    constexpr auto parse(std::format_parse_context& ctx) { return ctx.begin(); }
 
     auto format(const money::Money& money, std::format_context& ctx) const {
         return std::format_to(ctx.out(), "{}", money.to_string());
