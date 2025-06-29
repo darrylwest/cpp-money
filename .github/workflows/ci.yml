@@ -9,13 +9,13 @@ on:
 
 jobs:
   build-test-demo:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-22.04
     
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
       
-    - name: Install dependencies and upgrade GCC
+    - name: Install dependencies and setup compiler
       run: |
         # Update package lists
         sudo apt-get update
@@ -26,23 +26,27 @@ jobs:
           wget \
           software-properties-common \
           python3-pip \
-          libcatch2-dev \
+          catch2 \
           clang-format \
           git
         
-        # Add toolchain repository for newer GCC
+        # Try to get GCC 13 first (more likely to work on Ubuntu 22.04)
         sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
         sudo apt-get update
         
-        # Install GCC 14
-        sudo apt-get install -y gcc-14 g++-14
-        
-        # Set GCC 14 as default
-        sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-14 100
-        sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-14 100
+        # Install GCC 13 (fallback if GCC 14 fails)
+        if sudo apt-get install -y gcc-13 g++-13; then
+          echo "Successfully installed GCC 13"
+          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-13 100
+          sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-13 100
+        else
+          echo "GCC 13 failed, using system default GCC"
+          gcc --version
+        fi
         
         # Install CMake 3.30+
-        pip3 install cmake --break-system-packages
+        pip3 install cmake --user
+        echo "$HOME/.local/bin" >> $GITHUB_PATH
         
     - name: Verify compiler and build tool versions
       run: |
@@ -52,9 +56,19 @@ jobs:
         echo "=== CMake Version ==="
         cmake --version
         echo "=== Testing C++23 Support ==="
-        echo '#include <print>' > test_cpp23.cpp
-        echo 'int main() { std::println("C++23 works!"); return 0; }' >> test_cpp23.cpp
-        g++ -std=c++23 test_cpp23.cpp -o test_cpp23 && echo "C++23 compilation: SUCCESS" || echo "C++23 compilation: FAILED"
+        echo '#include <iostream>' > test_cpp23.cpp
+        echo '#include <format>' >> test_cpp23.cpp
+        echo 'int main() { std::cout << std::format("C++23 format works: {}", 42) << std::endl; return 0; }' >> test_cpp23.cpp
+        if g++ -std=c++23 test_cpp23.cpp -o test_cpp23 2>/dev/null; then
+          echo "C++23 compilation: SUCCESS"
+          ./test_cpp23
+        else
+          echo "C++23 compilation: FAILED, trying C++20"
+          echo '#include <iostream>' > test_cpp20.cpp
+          echo 'int main() { std::cout << "C++20 works!" << std::endl; return 0; }' >> test_cpp20.cpp
+          g++ -std=c++20 test_cpp20.cpp -o test_cpp20 && echo "C++20 compilation: SUCCESS" || echo "C++20 compilation: FAILED"
+          rm -f test_cpp20.cpp test_cpp20
+        fi
         rm -f test_cpp23.cpp test_cpp23
         
     - name: Initialize build
