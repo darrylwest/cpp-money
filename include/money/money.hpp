@@ -15,7 +15,7 @@
 #include <string>
 
 namespace money {
-    constexpr auto VERSION = "0.5.4-105";
+    constexpr auto VERSION = "0.5.4-106";
 
     struct Money {
       private:
@@ -153,3 +153,15 @@ namespace money {
     }
 
 }  // namespace money
+
+// std::formatter specialization for Money
+template <>
+struct std::formatter<money::Money> {
+    constexpr auto parse(std::format_parse_context& ctx) {
+        return ctx.begin();
+    }
+
+    auto format(const money::Money& money, std::format_context& ctx) const {
+        return std::format_to(ctx.out(), "{}", money.to_string());
+    }
+};

@@ -38,6 +38,12 @@ do
 
             shift
         ;;
+        demo)
+            ./mk build
+            ./build/cart_demo
+
+            exit 0
+        ;;
         format)
             clang-format -i include/money/*.hpp src/*.cpp
             git status -s
@@ -69,6 +75,7 @@ do
             echo ""
             echo "   init     : run the cmake command to create the build folder"
             echo "   build    : compile cryptor to the build folder"
+            echo "   demo     : run the cart demo"
             echo "   format   : runs clang-format over includes and src"
             echo "   watch    : run watcher over source and include"
             echo "   pull     : pull the latest repo changes"

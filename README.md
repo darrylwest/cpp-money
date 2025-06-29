@@ -50,6 +50,49 @@ std::println("{}", p4); // -$123.00
 
 _See unit tests for more examples..._
 
+## Shopping Cart Example
+
+The `examples/` directory contains a complete shopping cart implementation demonstrating real-world usage of the Money library:
+
+```bash
+# Build and run the example
+./mk build
+./build/cart_demo
+```
+
+### Example Features
+
+- **CartItem struct** - Product name, description, Money price, and quantity
+- **ShoppingCart container** - Add/remove items, calculate totals
+- **Automatic quantity consolidation** - Adding duplicate items updates quantity
+- **C++23 features** - Uses ranges, `std::println`, and modern formatting
+- **Professional output** - Formatted table display with aligned columns
+
+### Sample Usage
+
+```c++
+#include "shopping_cart.hpp"
+#include <money/money.hpp>
+
+ShoppingCart cart;
+
+// Add items to cart
+cart.add_item("Laptop", "Gaming laptop", Money::from_dollars(1299.99), 1);
+cart.add_item("Mouse", "Wireless mouse", Money::from_dollars(29.95), 2);
+
+// Display formatted cart
+cart.display();
+
+// Calculate totals
+auto total = cart.total();
+std::println("Cart total: {}", total);
+
+// Tax calculations
+auto tax = total * 0.08;  // 8% sales tax
+std::println("Tax: {}", tax);
+std::println("Total with tax: {}", total + tax);
+```
+
 ## Notes
 
 _Requires C++23 compatible compiler - tested on macOS Clang 18+ and Linux GCC 14+_

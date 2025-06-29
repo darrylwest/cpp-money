@@ -42,6 +42,15 @@ if(EXISTS ${CMAKE_SOURCE_DIR}/tests)
     include(CTest)
 endif()
 
+# Add examples (if examples directory exists)
+if(EXISTS ${CMAKE_SOURCE_DIR}/examples)
+    add_executable(cart_demo 
+        examples/cart_demo.cpp
+        examples/shopping_cart.cpp
+    )
+    target_link_libraries(cart_demo ${PROJECT_NAME})
+endif()
+
 # Install rules
 install(TARGETS ${PROJECT_NAME} DESTINATION lib)
 install(DIRECTORY include/money DESTINATION include)
