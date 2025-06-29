@@ -205,6 +205,10 @@ TEST_CASE("Money tests", "[from_dollars][zero]") {
     auto v2 = Money::from_dollars(0.00);
     REQUIRE(v2.as_cents() == 0);
     REQUIRE(v2.as_dollars() == 0.0);
+
+    auto v3 = Money::from_dollars(-0.0);
+    REQUIRE(v3.as_cents() == 0);
+    REQUIRE(v3.as_dollars() == 0.0);
 }
 
 TEST_CASE("Money tests", "[multiplication][negative_scalar]") {
