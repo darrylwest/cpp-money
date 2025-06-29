@@ -1,0 +1,140 @@
+name: CI Build and Test
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+jobs:
+  build-test-demo:
+    runs-on: ubuntu-latest
+    container: debian:12
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Configure APT sources and install dependencies
+      run: |
+        # Update package lists
+        apt-get update
+        
+        # Install basic tools
+        apt-get install -y wget gnupg2 software-properties-common
+        
+        # Add testing repository for GCC 14
+        echo "deb http://deb.debian.org/debian testing main" >> /etc/apt/sources.list
+        echo "deb-src http://deb.debian.org/debian testing main" >> /etc/apt/sources.list
+        
+        # Set up APT pinning to prefer stable but allow GCC 14 from testing
+        mkdir -p /etc/apt/preferences.d
+        cat > /etc/apt/preferences.d/gcc14 << 'EOF'
+        Package: *
+        Pin: release a=testing
+        Pin-Priority: 50
+        
+        Package: gcc-14 g++-14 libstdc++-14-dev
+        Pin: release a=testing
+        Pin-Priority: 990
+        EOF
+        
+        # Update package lists with new sources
+        apt-get update
+        
+        # Install GCC 14 and development tools
+        apt-get install -y \
+          gcc-14 \
+          g++-14 \
+          libstdc++-14-dev \
+          build-essential \
+          make \
+          python3 \
+          python3-pip \
+          libcatch2-dev \
+          clang-format \
+          git
+        
+        # Set GCC 14 as default
+        update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-14 100
+        update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-14 100
+        
+        # Install CMake 3.30+
+        pip3 install cmake --break-system-packages
+        
+    - name: Verify compiler and build tool versions
+      run: |
+        echo "=== Compiler Versions ==="
+        gcc --version
+        g++ --version
+        echo "=== CMake Version ==="
+        cmake --version
+        echo "=== Testing C++23 Support ==="
+        echo '#include <print>' > test_cpp23.cpp
+        echo 'int main() { std::println("C++23 works!"); return 0; }' >> test_cpp23.cpp
+        g++ -std=c++23 test_cpp23.cpp -o test_cpp23 && echo "C++23 compilation: SUCCESS" || echo "C++23 compilation: FAILED"
+        rm -f test_cpp23.cpp test_cpp23
+        
+    - name: Initialize build
+      run: ./mk init
+      
+    - name: Build project
+      run: ./mk build
+      
+    - name: Run unit tests
+      run: ./mk test
+      
+    - name: Run shopping cart demo
+      run: |
+        echo "=== Running Shopping Cart Demo ==="
+        ./mk demo
+        
+    - name: Verify demo output
+      run: |
+        echo "=== Verifying Demo Output Contains Expected Elements ==="
+        ./build/cart_demo > demo_output.txt 2>&1
+        
+        # Check for key elements in demo output
+        if grep -q "Shopping Cart Demo" demo_output.txt; then
+          echo "✓ Demo title found"
+        else
+          echo "✗ Demo title missing"
+          exit 1
+        fi
+        
+        if grep -q "Cart total:" demo_output.txt; then
+          echo "✓ Cart total calculation found"
+        else
+          echo "✗ Cart total calculation missing"
+          exit 1
+        fi
+        
+        if grep -q "Tax (8%):" demo_output.txt; then
+          echo "✓ Tax calculation found"
+        else
+          echo "✗ Tax calculation missing"
+          exit 1
+        fi
+        
+        if grep -q "Shopping cart is empty" demo_output.txt; then
+          echo "✓ Cart clearing functionality found"
+        else
+          echo "✗ Cart clearing functionality missing"
+          exit 1
+        fi
+        
+        echo "=== Demo Output Verification: SUCCESS ==="
+        
+    - name: Check code formatting
+      run: |
+        echo "=== Checking Code Formatting ==="
+        ./mk format
+        if [ -n "$(git status --porcelain)" ]; then
+          echo "✗ Code formatting issues found:"
+          git status --porcelain
+          git diff
+          exit 1
+        else
+          echo "✓ Code formatting is correct"
+        fi
