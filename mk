@@ -12,6 +12,11 @@ export project=money
 while [[ $# -gt 0 ]]
 do
     case $1 in
+        all)
+            git pull && ./mk clobber init format build test
+
+            exit 0
+        ;;
         init)
             /bin/rm -fr build/
             (mkdir build && cd build && cmake ..)
@@ -27,6 +32,8 @@ do
             shift
         ;;
         test|unit)
+            (cd build && time make -j4 || exit 1)
+
             ./build/money_tests
 
             shift
