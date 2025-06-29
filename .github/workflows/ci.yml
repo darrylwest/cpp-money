@@ -15,38 +15,90 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
       
-    - name: Install dependencies and setup compiler
+    - name: Cache GCC 14 build
+      uses: actions/cache@v4
+      id: gcc-cache
+      with:
+        path: ~/gcc-14
+        key: gcc-14.2.0-ubuntu-22.04-${{ runner.arch }}
+        
+    - name: Install dependencies and build GCC 14
+      if: steps.gcc-cache.outputs.cache-hit != 'true'
       run: |
         # Update package lists
         sudo apt-get update
         
-        # Install basic development tools (skip catch2 for now)
+        # Install dependencies for building GCC
         sudo apt-get install -y \
           build-essential \
           wget \
-          software-properties-common \
+          curl \
+          tar \
+          xz-utils \
           python3-pip \
           clang-format \
           git \
-          libspdlog-dev
+          libspdlog-dev \
+          libgmp-dev \
+          libmpfr-dev \
+          libmpc-dev \
+          flex \
+          bison \
+          texinfo
         
-        # Try to get GCC 13 first (more likely to work on Ubuntu 22.04)
-        sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
-        sudo apt-get update
-        
-        # Install GCC 13 (fallback if GCC 14 fails)
-        if sudo apt-get install -y gcc-13 g++-13; then
-          echo "Successfully installed GCC 13"
-          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-13 100
-          sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-13 100
-        else
-          echo "GCC 13 failed, using system default GCC"
-          gcc --version
-        fi
-        
-        # Install CMake 3.30+
+        # Install CMake 3.30+ first
         pip3 install cmake --user
         echo "$HOME/.local/bin" >> $GITHUB_PATH
+        
+        # Create GCC build directory
+        mkdir -p $HOME/gcc-build
+        cd $HOME/gcc-build
+        
+        # Download GCC 14.2.0 source
+        echo "Downloading GCC 14.2.0 source..."
+        wget https://gcc.gnu.org/releases/gcc-14.2.0/gcc-14.2.0.tar.xz
+        tar -xf gcc-14.2.0.tar.xz
+        cd gcc-14.2.0
+        
+        # Download prerequisites
+        ./contrib/download_prerequisites
+        
+        # Create build directory
+        cd ..
+        mkdir gcc-14-build
+        cd gcc-14-build
+        
+        # Configure GCC (minimal build for C++)
+        echo "Configuring GCC 14..."
+        ../gcc-14.2.0/configure \
+          --prefix=$HOME/gcc-14 \
+          --enable-languages=c,c++ \
+          --disable-multilib \
+          --disable-bootstrap \
+          --enable-checking=release
+        
+        # Build GCC (this will take a while)
+        echo "Building GCC 14 (this may take 20-30 minutes)..."
+        make -j$(nproc)
+        
+        # Install GCC
+        echo "Installing GCC 14..."
+        make install
+        
+        # Set GCC 14 as default
+        echo "$HOME/gcc-14/bin" >> $GITHUB_PATH
+        export PATH="$HOME/gcc-14/bin:$PATH"
+        
+        # Update library path
+        echo "$HOME/gcc-14/lib64" | sudo tee /etc/ld.so.conf.d/gcc-14.conf
+        sudo ldconfig
+        
+    - name: Setup GCC 14 environment
+      run: |
+        # Add GCC 14 to PATH for cached builds
+        echo "$HOME/gcc-14/bin" >> $GITHUB_PATH
+        echo "$HOME/gcc-14/lib64" | sudo tee /etc/ld.so.conf.d/gcc-14.conf
+        sudo ldconfig
         
     - name: Install Catch2 v3
       run: |
@@ -60,29 +112,31 @@ jobs:
         
     - name: Verify compiler and build tool versions
       run: |
+        export PATH="$HOME/gcc-14/bin:$PATH"
+        export LD_LIBRARY_PATH="$HOME/gcc-14/lib64:$LD_LIBRARY_PATH"
+        
         echo "=== Compiler Versions ==="
         gcc --version
         g++ --version
         echo "=== CMake Version ==="
         cmake --version
-        echo "=== Testing C++23 Support ==="
-        echo '#include <iostream>' > test_cpp23.cpp
-        echo '#include <format>' >> test_cpp23.cpp
-        echo 'int main() { std::cout << std::format("C++23 format works: {}", 42) << std::endl; return 0; }' >> test_cpp23.cpp
+        echo "=== Testing C++23 Support with <print> ==="
+        echo '#include <print>' > test_cpp23.cpp
+        echo 'int main() { std::println("C++23 with <print> works: {}", 42); return 0; }' >> test_cpp23.cpp
         if g++ -std=c++23 test_cpp23.cpp -o test_cpp23 2>/dev/null; then
-          echo "C++23 compilation: SUCCESS"
+          echo "C++23 <print> compilation: SUCCESS"
           ./test_cpp23
         else
-          echo "C++23 compilation: FAILED, trying C++20"
-          echo '#include <iostream>' > test_cpp20.cpp
-          echo 'int main() { std::cout << "C++20 works!" << std::endl; return 0; }' >> test_cpp20.cpp
-          g++ -std=c++20 test_cpp20.cpp -o test_cpp20 && echo "C++20 compilation: SUCCESS" || echo "C++20 compilation: FAILED"
-          rm -f test_cpp20.cpp test_cpp20
+          echo "C++23 <print> compilation: FAILED"
+          g++ -std=c++23 test_cpp23.cpp -o test_cpp23 -v
+          exit 1
         fi
         rm -f test_cpp23.cpp test_cpp23
         
     - name: Initialize build
       run: |
+        export PATH="$HOME/gcc-14/bin:$PATH"
+        export LD_LIBRARY_PATH="$HOME/gcc-14/lib64:$LD_LIBRARY_PATH"
         rm -rf build/
         mkdir build
         cd build
@@ -90,11 +144,15 @@ jobs:
       
     - name: Build project
       run: |
+        export PATH="$HOME/gcc-14/bin:$PATH"
+        export LD_LIBRARY_PATH="$HOME/gcc-14/lib64:$LD_LIBRARY_PATH"
         cd build
         make -j4
       
     - name: Run unit tests
       run: |
+        export PATH="$HOME/gcc-14/bin:$PATH"
+        export LD_LIBRARY_PATH="$HOME/gcc-14/lib64:$LD_LIBRARY_PATH"
         cd build
         make -j4
         cd ..
@@ -102,6 +160,8 @@ jobs:
       
     - name: Run shopping cart demo
       run: |
+        export PATH="$HOME/gcc-14/bin:$PATH"
+        export LD_LIBRARY_PATH="$HOME/gcc-14/lib64:$LD_LIBRARY_PATH"
         echo "=== Running Shopping Cart Demo ==="
         cd build
         make -j4
@@ -110,6 +170,8 @@ jobs:
         
     - name: Verify demo output
       run: |
+        export PATH="$HOME/gcc-14/bin:$PATH"
+        export LD_LIBRARY_PATH="$HOME/gcc-14/lib64:$LD_LIBRARY_PATH"
         echo "=== Verifying Demo Output Contains Expected Elements ==="
         ./build/cart_demo > demo_output.txt 2>&1
         
