@@ -4,7 +4,7 @@ This document provides context for the c++23 money library.  The target environm
 
 ## Project Overview
 
-A library to support currency operations primarily targeted to north america.
+A C++23 library to support currency operations primarily targeted to North America. The library provides a `Money` struct with precise decimal arithmetic using int64_t internally to avoid floating-point precision issues. Current version: 0.5.4-105.
 
 ## Build Instructions
 
@@ -30,24 +30,70 @@ The project is built using `CMake` and a C++23 compatible compiler. The `mk` scr
   ./mk clobber
   ```
 
+- **Format code:**
+  ```bash
+  ./mk format
+  ```
+
+- **Watch for changes and auto-rebuild:**
+  ```bash
+  ./mk watch
+  ```
+
+- **Complete workflow (pull, rebuild, test):**
+  ```bash
+  ./mk all
+  ```
+
 ## Testing
 
-The project has two test suites: `unit_tests` and `api_tests`. The `mk` script can be used to run them.
+The project uses Catch2 v3 testing framework with comprehensive unit tests covering constructors, arithmetic operations, string parsing, formatting, and edge cases.
 
-- **Run unit tests:**
+- **Run tests:**
   ```bash
   ./mk test
   ```
 
 ## Source Code
 
+- **Header:** `include/money/money.hpp` - Main `Money` struct with comprehensive operator overloading
+- **Implementation:** `src/money.cpp` - String formatting and std::formatter specialization  
+- **Tests:** `tests/money_tests.cpp` - Comprehensive unit tests using Catch2
+
+The `Money` struct provides:
+- Static factory methods: `from_dollars()`, `from_string()`, `zero()`
+- Arithmetic operators: `+, -, *, /`
+- Comparison operators: `==, !=, <, <=, >, >=`
+- State checking: `is_zero()`, `is_positive()`, `is_negative()`
+- String conversion: `to_string()` with US locale formatting
 
 ## Dependencies
 
-These dependencies are managed through `CPM.cmake` and `find_package` in the `CMakeLists.txt` file.
+- **CMake 3.30+** - Build system
+- **C++23 compatible compiler** - GCC 14+, Clang 18+, or equivalent
+- **Catch2 v3** - Testing framework (managed via find_package)
+- **clang-format** - Code formatting (optional)
 
-## Other Commands
+## Installation
 
+After building, install the library and headers:
+
+```bash
+cd build
+make install
+```
+
+This installs:
+- Static library: `libmoney.a`
+- Headers: `money/money.hpp`
+
+## Code Style
+
+The project uses clang-format with Google style (120 column limit, 4-space indentation). Format code with:
+
+```bash
+./mk format
+```
 
 ## c++23 Preferences
 
