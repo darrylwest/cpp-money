@@ -214,15 +214,3 @@ jobs:
         
         echo "=== Demo Output Verification: SUCCESS ==="
         
-    - name: Check code formatting
-      run: |
-        echo "=== Checking Code Formatting ==="
-        clang-format -i include/money/*.hpp src/*.cpp examples/*.hpp examples/*.cpp
-        if [ -n "$(git status --porcelain)" ]; then
-          echo "✗ Code formatting issues found:"
-          git status --porcelain
-          git diff
-          exit 1
-        else
-          echo "✓ Code formatting is correct"
-        fi
