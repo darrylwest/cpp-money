@@ -82,18 +82,31 @@ jobs:
         rm -f test_cpp23.cpp test_cpp23
         
     - name: Initialize build
-      run: ./mk init
+      run: |
+        rm -rf build/
+        mkdir build
+        cd build
+        cmake ..
       
     - name: Build project
-      run: ./mk build
+      run: |
+        cd build
+        make -j4
       
     - name: Run unit tests
-      run: ./mk test
+      run: |
+        cd build
+        make -j4
+        cd ..
+        ./build/money_tests
       
     - name: Run shopping cart demo
       run: |
         echo "=== Running Shopping Cart Demo ==="
-        ./mk demo
+        cd build
+        make -j4
+        cd ..
+        ./build/cart_demo
         
     - name: Verify demo output
       run: |
@@ -134,7 +147,7 @@ jobs:
     - name: Check code formatting
       run: |
         echo "=== Checking Code Formatting ==="
-        ./mk format
+        clang-format -i include/money/*.hpp src/*.cpp examples/*.hpp examples/*.cpp
         if [ -n "$(git status --porcelain)" ]; then
           echo "✗ Code formatting issues found:"
           git status --porcelain
