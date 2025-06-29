@@ -20,15 +20,15 @@ jobs:
         # Update package lists
         sudo apt-get update
         
-        # Install basic development tools
+        # Install basic development tools (skip catch2 for now)
         sudo apt-get install -y \
           build-essential \
           wget \
           software-properties-common \
           python3-pip \
-          catch2 \
           clang-format \
-          git
+          git \
+          libspdlog-dev
         
         # Try to get GCC 13 first (more likely to work on Ubuntu 22.04)
         sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
@@ -47,6 +47,16 @@ jobs:
         # Install CMake 3.30+
         pip3 install cmake --user
         echo "$HOME/.local/bin" >> $GITHUB_PATH
+        
+    - name: Install Catch2 v3
+      run: |
+        # Install Catch2 v3 from source (Ubuntu 22.04 only has v2)
+        git clone https://github.com/catchorg/Catch2.git
+        cd Catch2
+        git checkout v3.7.1  # Use a stable v3 release
+        cmake -B build -S . -DBUILD_TESTING=OFF
+        cmake --build build
+        sudo cmake --install build
         
     - name: Verify compiler and build tool versions
       run: |
