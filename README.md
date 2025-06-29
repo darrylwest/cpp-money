@@ -42,17 +42,17 @@ assert(p3 == Money::from_dollars(100));
 assert(p3 / 2 == Money(5000));
 
 const double dollars = -123.00;
-const p4 = Money::from_dollars(dollars);
+const auto p4 = Money::from_dollars(dollars);
 assert(p4.as_cents() == -12300);
 
-std::println("{}", p4.to_string()); // -$123.00
+std::println("{}", p4); // -$123.00
 ```
 
 _See unit tests for more examples..._
 
 ## Notes
 
-_Compiled and tested on osx clang 17.0 and linux gcc 14.2.0_
+_Requires C++23 compatible compiler - tested on macOS Clang 18+ and Linux GCC 14+_
 
 There is a shell script `mk` to build, test and deploy the lib.  Or, you can do this...
 
@@ -77,5 +77,5 @@ endif()
 
 ```
 
-###### dpw | 2025-06-20
+###### dpw | 2025-06-29
 
