@@ -2,7 +2,7 @@ name: CI Build and Test
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, develop ]
   workflow_dispatch:
 
 jobs:
@@ -18,7 +18,7 @@ jobs:
       id: gcc-cache
       with:
         path: ~/gcc-14
-        key: gcc-14.1.0-ubuntu-22.04-${{ runner.arch }}
+        key: gcc-14.2.0-ubuntu-22.04-${{ runner.arch }}
         
     - name: Install dependencies and build GCC 14
       if: steps.gcc-cache.outputs.cache-hit != 'true'
@@ -60,11 +60,11 @@ jobs:
         mkdir -p $HOME/gcc-build
         cd $HOME/gcc-build
         
-        # Download GCC 14.1.0 source (stable release)
-        echo "Downloading GCC 14.1.0 source..."
-        wget https://ftp.gnu.org/gnu/gcc/gcc-14.1.0/gcc-14.1.0.tar.xz
-        tar -xf gcc-14.1.0.tar.xz
-        cd gcc-14.1.0
+        # Download GCC 14.2.0 source (stable release)
+        echo "Downloading GCC 14.2.0 source..."
+        wget https://ftp.gnu.org/gnu/gcc/gcc-14.2.0/gcc-14.2.0.tar.xz
+        tar -xf gcc-14.2.0.tar.xz
+        cd gcc-14.2.0
         
         # Download prerequisites
         ./contrib/download_prerequisites
@@ -76,7 +76,7 @@ jobs:
         
         # Configure GCC (minimal build for C++)
         echo "Configuring GCC 14..."
-        ../gcc-14.1.0/configure \
+        ../gcc-14.2.0/configure \
           --prefix=$HOME/gcc-14 \
           --enable-languages=c,c++ \
           --disable-multilib \
