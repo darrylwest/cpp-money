@@ -120,5 +120,9 @@ endif()
 
 ```
 
-###### dpw | 2025-06-29
+## References
+
+* bug: [GLIBCXX_3.4.32 missing discussion and fix](https://g.co/gemini/share/bdc7e468e3b3)
+
+###### dpw | 2025-07-01
 
