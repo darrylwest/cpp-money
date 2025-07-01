@@ -42,6 +42,7 @@ if(EXISTS ${CMAKE_SOURCE_DIR}/tests)
     )
     target_link_libraries(money_tests Catch2::Catch2WithMain)
     target_link_libraries(money_tests ${PROJECT_NAME}) # Link tests to the static library
+    target_link_options(money_tests PRIVATE -static-libstdc++)
 
     include(CTest)
 endif()
@@ -53,6 +54,9 @@ if(EXISTS ${CMAKE_SOURCE_DIR}/examples)
         examples/shopping_cart.cpp
     )
     target_link_libraries(cart_demo ${PROJECT_NAME})
+
+    # Link options
+    target_link_options(cart_demo PRIVATE -static-libstdc++)
 endif()
 
 # Install rules
