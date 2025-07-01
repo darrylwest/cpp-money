@@ -3,8 +3,6 @@
 //
 #define CATCH_CONFIG_MAIN  // This tells Catch to provide a main() function
 
-#include <spdlog/spdlog.h>
-
 #include <catch2/catch_all.hpp>
 #include <print>
 #include <money/money.hpp>
