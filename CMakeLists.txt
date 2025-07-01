@@ -28,8 +28,8 @@ target_compile_options(${PROJECT_NAME} PRIVATE
 )
 
 # Find and link fmt library for C++23 locale formatting support
-find_package(PkgConfig REQUIRED)
-pkg_check_modules(FMT REQUIRED fmt)
+#  find_package(PkgConfig REQUIRED)
+# pkg_check_modules(FMT REQUIRED fmt)
 
 # Link system libraries needed for C++23 locale formatting
 target_link_libraries(${PROJECT_NAME} PRIVATE pthread ${FMT_LIBRARIES})

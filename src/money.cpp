@@ -24,4 +24,9 @@ namespace money {
         return std::format("{}${}.{:02}", sign, ss, abs_cents % 100);
     }
 
+    constexpr std::string Money::currency() {
+        return m_currency;
+    }
+
+
 }  // namespace money

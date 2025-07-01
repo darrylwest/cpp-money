@@ -15,12 +15,13 @@
 #include <string>
 
 namespace money {
-    constexpr auto VERSION = "0.5.4-106";
+    constexpr auto VERSION = "0.5.4-107";
 
     struct Money {
       private:
         // Use the explicit 64-bit integer type
         int64_t m_cents;
+        std::string m_currency = "USD";
 
       public:
         // --- Constructors ---
@@ -40,9 +41,11 @@ namespace money {
             }
         }
 
-        static Money zero() { return Money(0); }
+        constexpr std::string currency();
 
-        static Money from_dollars(const double dollars) {
+        static constexpr Money zero() { return Money(0); }
+
+        static constexpr Money from_dollars(const double dollars) {
             // this way works; don't try to manipulate the double
 
             const auto ss = std::format("{:.2f}", dollars);
@@ -52,7 +55,7 @@ namespace money {
             return m;
         }
 
-        static Money from_string(const std::string& value) {
+        static constexpr Money from_string(const std::string& value) {
             // Remove the dollar sign and commas
             std::string cleaned_str;
             std::copy_if(value.begin(), value.end(), std::back_inserter(cleaned_str),
@@ -84,14 +87,14 @@ namespace money {
 
         // --- Accessors ---
         // The accessor now returns int64_t
-        constexpr int64_t as_cents() const { return m_cents; }
-        double as_dollars() const { return static_cast<double>(m_cents) / 100.0; }
+        [[nodiscard]] constexpr int64_t as_cents() const { return m_cents; }
+        [[nodiscard]] double as_dollars() const { return static_cast<double>(m_cents) / 100.0; }
 
         // returns the dollar component of this money object
-        constexpr int64_t dollars() const { return m_cents / 100; }
+        [[nodiscard]] constexpr int64_t dollars() const { return m_cents / 100; }
 
         // returns the cents component of this money object
-        constexpr int8_t cents() const { return m_cents % 100; }
+        [[nodiscard]] constexpr int8_t cents() const { return m_cents % 100; }
 
         // --- Operator Overloading --
         constexpr Money& operator+=(const Money& rhs) noexcept {
