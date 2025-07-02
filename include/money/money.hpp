@@ -8,14 +8,13 @@
 #include <cstdint>
 #include <format>
 #include <iomanip>
-#include <print>
 #include <ranges>
 #include <sstream>
 #include <stdexcept>
 #include <string>
 
 namespace money {
-    constexpr auto VERSION = "0.5.4-107";
+    constexpr auto VERSION = "0.5.5-108";
 
     struct Money {
       private:
@@ -49,7 +48,6 @@ namespace money {
             // this way works; don't try to manipulate the double
 
             const auto ss = std::format("{:.2f}", dollars);
-            // std::println("num: {}, str: {}", dollars, ss);
             auto m = Money::from_string(ss);
 
             return m;
