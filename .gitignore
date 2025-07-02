@@ -4,3 +4,5 @@ build
 cmake-build-*
 logs/*.log
 sites
+artifacts/*.tgz
+artifacts/*.tar.gz
